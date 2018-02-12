@@ -75,9 +75,10 @@ public class Event {
      */
     String description = "My MacPro is going nuts";
     /**
+     * agent_time	String	Timestamp of when the event occurred in Unix epoch time.
      * The actual time when the event was raised.
      */
-    Long agent_time = new Date().getTime();
+    Long agent_time = new Date().getTime() / 1000;
 
     public String getJson() {
         return "{" +
@@ -122,19 +123,19 @@ public class Event {
         this.signature = signature;
     }
 
-    public String getSource_id() {
+    public String getSourceId() {
         return source_id;
     }
 
-    public void setSource_id(String source_id) {
+    public void setSourceId(String source_id) {
         this.source_id = source_id;
     }
 
-    public String getExternal_id() {
+    public String getExternalId() {
         return external_id;
     }
 
-    public void setExternal_id(String external_id) {
+    public void setExternalId(String external_id) {
         this.external_id = external_id;
     }
 
@@ -162,11 +163,11 @@ public class Event {
         this.eventClass = eventClass;
     }
 
-    public String getAgent_location() {
+    public String getAgentLocation() {
         return agent_location;
     }
 
-    public void setAgent_location(String agent_location) {
+    public void setAgentLocation(String agent_location) {
         this.agent_location = agent_location;
     }
 
@@ -194,11 +195,11 @@ public class Event {
         this.description = description;
     }
 
-    public Long getAgent_time() {
+    public Long getAgentTime() {
         return agent_time;
     }
 
-    public void setAgent_time(Long agent_time) {
+    public void setAgentTime(Long agent_time) {
         this.agent_time = agent_time;
     }
 }
