@@ -19,12 +19,39 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
+import static com.google.common.base.Preconditions.checkState;
+
 public class DataUplink {
 
     String protocol = "https://";
     String baseUrlString = ".moogsoft.io/events/";
 
+    MoogsoftCredentials credentials = null;
+    String moogEngineName = null;
+    String webHookName = null;
+
     final static Logger logger = Logger.getLogger(DataUplink.class);
+
+    public void configureUplink(String moogEngineName, String webHookName, MoogsoftCredentials credentials) {
+        this.moogEngineName = moogEngineName;
+        this.webHookName = webHookName;
+        this.credentials = credentials;
+    }
+
+    /**
+     * if this DataUplink was configured using the configureUplink method, this method can be used as a shorthand
+     * to upload an event to the configured Moogsoft engine.
+     *
+     * @param event
+     * @throws AuthenticationException
+     * @throws IOException
+     * @throws UnsupportedEncodingException
+     */
+    public void sendEvent(Event event) throws AuthenticationException, IOException, UnsupportedEncodingException {
+        checkState(credentials != null && !StringUtils.isBlank(moogEngineName) && !StringUtils.isBlank(webHookName),
+                "Please configure DataUplink object before using the shortcut method.");
+        sendEvent(this.moogEngineName, this.webHookName, this.credentials, event);
+    }
 
     /**
      * @param moogEngineName gets assigned by MoogSoft as part of the registration process.
