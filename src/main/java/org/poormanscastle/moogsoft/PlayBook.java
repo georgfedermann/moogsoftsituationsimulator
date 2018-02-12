@@ -9,6 +9,13 @@ public interface PlayBook {
 
     void perform();
 
+    /**
+     * for your convenience you can provide a pre-configured datauplink for the playbook.
+     *
+     * @param dataUplink
+     */
+    void setDataUplink(DataUplink dataUplink);
+
 
     static PlayBook getDataStorageOutageSzenario() {
         return new SimpleDatastoreOutagePlaybook();

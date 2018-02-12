@@ -101,6 +101,22 @@ public class Event {
     private Event() {
     }
 
+    @Override
+    public String toString() {
+        return "Event{" +
+                "source='" + source + '\'' +
+                ", source_id='" + source_id + '\'' +
+                ", external_id='" + external_id + '\'' +
+                ", agent_location='" + agent_location + '\'' +
+                ", severity=" + severity +
+                ", description='" + description + '\'' +
+                ", type='" + type + '\'' +
+                ", manager='" + manager + '\'' +
+                ", eventClass='" + eventClass + '\'' +
+                ", agent_time=" + agent_time +
+                '}';
+    }
+
     /**
      * delivers an event that is configured with standard values.
      * only thing changing is the agent time when the event occurred.
@@ -126,9 +142,81 @@ public class Event {
         result.setSourceId("CMDB_1");
         result.setAgentLocation("DC_FRA_02_25");
         result.setSeverity(2);
-        result.setType("server:storage");
+        result.setType("server/storage");
         result.setEventClass("storage");
         result.setDescription(StringUtils.join("The data storage runs full. Capacity used is ", capacity, "%!"));
+        return result;
+    }
+
+    public static Event getDatabaseIsWorkingEvent() {
+        Event result = new Event();
+        result.setSource("Database MySQL");
+        result.setSourceId("CMDB_2");
+        result.setAgentLocation("DC_FRA_02_25");
+        result.setSeverity(0);
+        result.setType("server/storage");
+        result.setEventClass("storage");
+        result.setDescription(StringUtils.join("Just meant to say: the database is running alrighty-right!"));
+        return result;
+    }
+
+    public static Event getDatabaseIsDownError() {
+        Event result = new Event();
+        result.setSource("Database MySQL");
+        result.setSourceId("CMDB_2");
+        result.setAgentLocation("DC_FRA_02_25");
+        result.setSeverity(4);
+        result.setType("server/storage");
+        result.setEventClass("storage");
+        result.setDescription(StringUtils.join("The database just crashed! Error message is: The data storage is full. Capacity used is 100%"));
+        return result;
+    }
+
+    public static Event getOrderServicePerformanceImpactedWarning() {
+        Event result = new Event();
+        result.setSource("Order Service APM");
+        result.setSourceId("CMDB_3");
+        result.setAgentLocation("DC_FRA_02_26");
+        result.setSeverity(2);
+        result.setType("service/backend");
+        result.setEventClass("service");
+        result.setDescription(StringUtils.join("OrderService performance impacted. Service not answering for prolonged intervals."));
+        return result;
+    }
+
+    public static Event getOrderServiceError() {
+        Event result = new Event();
+        result.setSource("Order Service Monitor");
+        result.setSourceId("CMDB_3");
+        result.setAgentLocation("DC_FRA_02_26");
+        result.setSeverity(4);
+        result.setType("service/backend");
+        result.setEventClass("service");
+        result.setDescription(StringUtils.join("OrderService logs error message: database connection timeout. java.net.SocketException: java.net.ConnectException: Connection timed out: connect"));
+        return result;
+    }
+
+    public static Event getUserDataServiceError() {
+        Event result = new Event();
+        result.setSource("Userdata Service APM");
+        result.setSourceId("CMDB_4");
+        result.setAgentLocation("DC_FRA_04_01");
+        result.setSeverity(2);
+        result.setType("service/backend");
+        result.setEventClass("service");
+        result.setDescription(StringUtils.join("UserDataService logs error message: database connection timeout. java.net.SocketException: java.net.ConnectException: Connection timed out: connect"));
+        return result;
+    }
+
+    public static Event getUserDataServicePerformanceImpactedWarning() {
+        Event result = new Event();
+        result.setSource("Order Service Monitor");
+        result.setSourceId("CMDB_4");
+        result.setAgentLocation("DC_FRA_04_01");
+        result.setSeverity(4);
+        result.setType("service/backend");
+        result.setEventClass("service");
+        result.setDescription(StringUtils.join("UserDataService logs error message: database connection timeout. java.net.SocketException: java.net.ConnectException: Connection timed out: connect"));
         return result;
     }
 
@@ -221,4 +309,5 @@ public class Event {
     public void setAgentTime(Long agent_time) {
         this.agent_time = agent_time;
     }
+
 }

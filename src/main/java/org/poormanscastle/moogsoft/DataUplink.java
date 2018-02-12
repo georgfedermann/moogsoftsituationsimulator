@@ -93,9 +93,4 @@ public class DataUplink {
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        DataUplink uplink = new DataUplink();
-        uplink.sendEvent("badpush", "webhook_webhook_testwebhook",
-                MoogsoftCredentials.getGeorgCredentials(), Event.getStorageWarning(76));
-    }
 }
