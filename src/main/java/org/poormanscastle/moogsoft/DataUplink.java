@@ -68,16 +68,7 @@ public class DataUplink {
 
     public static void main(String[] args) throws Exception {
         DataUplink uplink = new DataUplink();
-        for (int severity = 0; severity < 10; severity++) {
-            logger.info(StringUtils.join("Generating 10 events at severity level ", severity));
-            for (int loopCount = 0; loopCount < 10; loopCount++) {
-                // ruderest, webhook_testwebhook
-                // badpush, webhook_webhook_testwebhook
-                uplink.sendEvent("badpush", "webhook_webhook_testwebhook",
-                        MoogsoftCredentials.getKevinCredentials(), Event.getStandardEventAtSeverityLevel(severity));
-                logger.info(StringUtils.join("Sent event # ", loopCount));
-                Thread.sleep(5000);
-            }
-        }
+        uplink.sendEvent("badpush", "webhook_webhook_testwebhook",
+                MoogsoftCredentials.getGeorgCredentials(), Event.getStorageWarning(76));
     }
 }

@@ -1,5 +1,7 @@
 package org.poormanscastle.moogsoft;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Date;
 
 /**
@@ -17,7 +19,7 @@ public class Event {
      * usually a combination of the values of source, class and type,
      * separated by a colon ":".
      */
-    String signature = "my_test_box:application_server:server";  // used to identify the id, fqdn:network/hardware/app:storage/latency
+    // String signature = "my_test_box:application_server:server";  // used to identify the id, fqdn:network/hardware/app:storage/latency
     /**
      * source	String	Hostname or FQDN of the source machine that generated the event.
      * we go for:
@@ -61,7 +63,7 @@ public class Event {
      * manager	String	General identifier of the event generator or intermediary.
      * again: no idea. We go for "Testkoch", somebody who is responsible for the given box.
      */
-    String manager = "Kevin";
+    String manager = "Testkoch";
     /**
      * class	String	Level of classification for the event. Follows hierarchy class then type.
      * we go for: application, database, infrastructure, storage
@@ -82,17 +84,17 @@ public class Event {
 
     public String getJson() {
         return "{" +
-                "'signature':'" + signature + "'," +
-                "'source_id':'" + source_id + "'," +
-                "'external_id':'" + external_id + "'," +
-                "'manager':'" + manager + "'," +
-                "'source':'" + source + "'," +
-                "'class':'" + eventClass + "'," +
-                "'agent_location':'" + agent_location + "'," +
-                "'type':'" + type + "'," +
-                "'severity':" + severity + "," +
-                "'description':'" + description + "'," +
-                "'agent_time':'" + agent_time + "'" +
+                "'signature':'" + getSignature() + "'," +
+                "'source_id':'" + getSourceId() + "'," +
+                "'external_id':'" + getExternalId() + "'," +
+                "'manager':'" + getManager() + "'," +
+                "'source':'" + getSource() + "'," +
+                "'class':'" + getEventClass() + "'," +
+                "'agent_location':'" + getAgentLocation() + "'," +
+                "'type':'" + getType() + "'," +
+                "'severity':" + getSeverity() + "," +
+                "'description':'" + getDescription() + "'," +
+                "'agent_time':'" + getAgentLocation() + "'" +
                 "}";
     }
 
@@ -109,6 +111,27 @@ public class Event {
         return new Event();
     }
 
+    /**
+     * creates a WARNING message that the storage is running out of storage.
+     * Please specify how much of the capacity has been used up so far.
+     *
+     * @param capacity an integer value stating how much of the capacity has been used up so far.
+     *                 75 would lead to a message that 75 % of the storage has been used so far. Please
+     *                 provide values between 0 and 100.
+     * @return a warning event that can be sent to moogsoft.
+     */
+    public static Event getStorageWarning(Integer capacity) {
+        Event result = new Event();
+        result.setSource("DataStorage_NAS001");
+        result.setSourceId("CMDB_1");
+        result.setAgentLocation("DC_FRA_02_25");
+        result.setSeverity(2);
+        result.setType("server:storage");
+        result.setEventClass("storage");
+        result.setDescription(StringUtils.join("The data storage runs full. Capacity used is ", capacity, "%!"));
+        return result;
+    }
+
     public static Event getStandardEventAtSeverityLevel(int severity) {
         Event event = new Event();
         event.setSeverity(severity);
@@ -116,11 +139,7 @@ public class Event {
     }
 
     public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
+        return StringUtils.join(getSource(), ":", getEventClass(), ":", getType());
     }
 
     public String getSourceId() {
