@@ -198,7 +198,7 @@ public class Event {
 
     public static Event getOrderServiceError() {
         Event result = new Event();
-        result.setSource("Order Service Monitor");
+        result.setSource("Order Service Logfile Monitor");
         result.setSourceId("CMDB_3");
         result.setAgentLocation("DC_FRA_02_26");
         result.setSeverity(4);
@@ -222,13 +222,13 @@ public class Event {
 
     public static Event getUserDataServicePerformanceImpactedWarning() {
         Event result = new Event();
-        result.setSource("Order Service Monitor");
+        result.setSource("Userdata Service Logfile Monitor");
         result.setSourceId("CMDB_4");
         result.setAgentLocation("DC_FRA_04_01");
         result.setSeverity(4);
         result.setType("service/backend");
         result.setEventClass("service");
-        result.setDescription(StringUtils.join("UserDataService logs error message: database connection timeout. java.net.SocketException: java.net.ConnectException: Connection timed out: connect"));
+        result.setDescription(StringUtils.join("UserDataService performance impacted. Service not answering for prolonged intervals."));
         return result;
     }
 
