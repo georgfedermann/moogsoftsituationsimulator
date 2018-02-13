@@ -148,6 +148,18 @@ public class Event {
         return result;
     }
 
+    public static Event getStorageOkEvent(Integer capacity) {
+        Event result = new Event();
+        result.setSource("DataStorage_NAS001");
+        result.setSourceId("CMDB_1");
+        result.setAgentLocation("DC_FRA_02_25");
+        result.setSeverity(0);
+        result.setType("server/storage");
+        result.setEventClass("storage");
+        result.setDescription(StringUtils.join("The data storage is ok. Capacity used is ", capacity, "%!"));
+        return result;
+    }
+
     public static Event getDatabaseIsWorkingEvent() {
         Event result = new Event();
         result.setSource("Database MySQL");

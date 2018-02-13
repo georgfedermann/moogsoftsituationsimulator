@@ -21,7 +21,7 @@ public class SimpleDatastoreOutagePlaybook implements PlayBook {
      * e.g. when data storage is full, systems like the database will fail
      */
     boolean isDataStorageFullFlag = false;
-    int dataStorageWarningIntervalInSeconds = 5;
+    int dataStorageWarningIntervalInSeconds = 30;
 
     boolean isDatabaseWorking = true;
     int databaseErrorIntervalInSeconds = 30;
@@ -158,16 +158,26 @@ public class SimpleDatastoreOutagePlaybook implements PlayBook {
     class DataStorageAlerter implements Runnable {
         @Override
         public void run() {
-            int currentCapacity = 95;
+            int repetitionCounter = 0;
+            int currentCapacity = 72;
+            // TODO maybe add some logic to suppress repeated green messages
+            // TODO what is the best practice: sending OK events repeatedly or just once.
             while (true) {
                 try {
                     currentCapacity = Math.min(currentCapacity + 1, 100);
-                    Event event = Event.getStorageWarning(currentCapacity);
+                    Event event = currentCapacity < 75 ?
+                            Event.getStorageOkEvent(currentCapacity) : Event.getStorageWarning(currentCapacity);
                     logger.info(StringUtils.join("DataStorageAlerter going to send event to moogsoft: ",
                             event.toString()));
                     dataUplink.sendEvent(event);
                     if (currentCapacity > 99) {
                         isDataStorageFullFlag = true;
+                        repetitionCounter++;
+                    }
+                    if (repetitionCounter >= 25) {
+                        currentCapacity = 60; // at this point, the admin adds storage (magically)
+                        isDataStorageFullFlag = false;
+                        repetitionCounter = 0;
                     }
                     logger.info(StringUtils.join("DataStorageAlerter going to sleep for ",
                             dataStorageWarningIntervalInSeconds * 1000, "s."));
