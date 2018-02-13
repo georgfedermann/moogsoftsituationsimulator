@@ -177,7 +177,7 @@ public class Event {
         result.setSource("Database MySQL");
         result.setSourceId("CMDB_2");
         result.setAgentLocation("DC_FRA_02_25");
-        result.setSeverity(4);
+        result.setSeverity(5);
         result.setType("server/storage");
         result.setEventClass("storage");
         result.setDescription(StringUtils.join("The database just crashed! Error message is: The data storage is full. Capacity used is 100%"));
@@ -201,10 +201,22 @@ public class Event {
         result.setSource("Order Service Logfile Monitor");
         result.setSourceId("CMDB_3");
         result.setAgentLocation("DC_FRA_02_26");
-        result.setSeverity(4);
+        result.setSeverity(5);
         result.setType("service/backend");
         result.setEventClass("service");
-        result.setDescription(StringUtils.join("OrderService logs error message: database connection timeout. java.net.SocketException: java.net.ConnectException: Connection timed out: connect"));
+        result.setDescription(StringUtils.join("Order Service logs error message: database connection timeout. java.net.SocketException: java.net.ConnectException: Connection timed out: connect"));
+        return result;
+    }
+
+    public static Event getOrderServiceBackToNormalEvent() {
+        Event result = new Event();
+        result.setSource("Order Service Logfile Monitor");
+        result.setSourceId("CMDB_3");
+        result.setAgentLocation("DC_FRA_02_26");
+        result.setSeverity(0);
+        result.setType("service/backend");
+        result.setEventClass("service");
+        result.setDescription(StringUtils.join("Order Service logs that the service is back to normal."));
         return result;
     }
 
@@ -216,7 +228,19 @@ public class Event {
         result.setSeverity(2);
         result.setType("service/backend");
         result.setEventClass("service");
-        result.setDescription(StringUtils.join("UserDataService logs error message: database connection timeout. java.net.SocketException: java.net.ConnectException: Connection timed out: connect"));
+        result.setDescription(StringUtils.join("Userdata Service logs error message: database connection timeout. java.net.SocketException: java.net.ConnectException: Connection timed out: connect"));
+        return result;
+    }
+
+    public static Event getUserDataServiceBackToNormal() {
+        Event result = new Event();
+        result.setSource("Userdata Service APM");
+        result.setSourceId("CMDB_4");
+        result.setAgentLocation("DC_FRA_04_01");
+        result.setSeverity(0);
+        result.setType("service/backend");
+        result.setEventClass("service");
+        result.setDescription(StringUtils.join("Userdata Service logs that the service is back to normal"));
         return result;
     }
 
@@ -225,10 +249,34 @@ public class Event {
         result.setSource("Userdata Service Logfile Monitor");
         result.setSourceId("CMDB_4");
         result.setAgentLocation("DC_FRA_04_01");
-        result.setSeverity(4);
+        result.setSeverity(5);
         result.setType("service/backend");
         result.setEventClass("service");
         result.setDescription(StringUtils.join("UserDataService performance impacted. Service not answering for prolonged intervals."));
+        return result;
+    }
+
+    public static Event getSkuServiceError() {
+        Event result = new Event();
+        result.setSource("SKU Service Logfile Monitor");
+        result.setSourceId("CMDB_5");
+        result.setAgentLocation("DC_FRA_02_27");
+        result.setSeverity(5);
+        result.setType("service/backend");
+        result.setEventClass("service");
+        result.setDescription(StringUtils.join("SKU Service logs error message: database connection timeout. java.net.SocketException: java.net.ConnectException: Connection timed out: connect."));
+        return result;
+    }
+
+    public static Event getSkuServiceBackToNormal() {
+        Event result = new Event();
+        result.setSource("SKU Service Logfile Monitor");
+        result.setSourceId("CMDB_5");
+        result.setAgentLocation("DC_FRA_02_27");
+        result.setSeverity(0);
+        result.setType("service/backend");
+        result.setEventClass("service");
+        result.setDescription(StringUtils.join("Userdata Service logs that the service is back to normal"));
         return result;
     }
 

@@ -27,12 +27,16 @@ public class SimpleDatastoreOutagePlaybook implements PlayBook {
     int databaseErrorIntervalInSeconds = 30;
 
     boolean isOrderServiceImpacted = false;
-    int orderServiceWarningIntervalInSeconds = 5;
-    int orderServiceMonitoringIntervalInSeconds = 5;
+    int orderServiceApmIntervalInSeconds = 5;
+    int orderServiceLogMonitoringIntervalInSeconds = 5;
 
     boolean isUserDataServiceImpacted = false;
-    int userDataServiceWarningIntervalInSeconds = 5;
-    int userDataServiceMonitoringIntervalInSeconds = 5;
+    int userDataServiceApmIntervalInSeconds = 5;
+    int userDataServiceLogMonitoringIntervalInSeconds = 5;
+
+    boolean isSkuServiceImpacted = false;
+    int skuServiceApmIntervalInSeconds = 5;
+    int skuServiceLogMonitoringIntervalInSeconds = 5;
 
 
     @Override
@@ -45,6 +49,46 @@ public class SimpleDatastoreOutagePlaybook implements PlayBook {
         new Thread(new UserDataServicePerformanceAlerter()).start();
     }
 
+    class SkuServiceAlerter implements Runnable {
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    // check if service just switched back to working again
+                    if (isSkuServiceImpacted && isDatabaseWorking) {
+                        // database just got operative again. System reports a recovery event to moogsoft
+                        Event event = Event.getSkuServiceBackToNormal();
+                        logger.info(StringUtils.join("SkuServiceAlerter going to send event to moogsoft: ",
+                                event.toString()));
+                        dataUplink.sendEvent(event);
+                    }
+
+                    isSkuServiceImpacted = !isDatabaseWorking;
+                    if (isSkuServiceImpacted) {
+                        logger.debug(StringUtils.join("********************* SkuServiceAlerter if branch, isSkuServiceImpacted=",
+                                isSkuServiceImpacted));
+
+                        Event event = Event.getSkuServiceError();
+                        logger.info(StringUtils.join("skuServiceAlerter going to send event to moogsoft: ",
+                                event.toString()));
+                        dataUplink.sendEvent(event);
+                    } else {
+                        logger.debug(StringUtils.join("********************* UserDataServiceAlerter else branch, isUserDataServiceImpacted=",
+                                isUserDataServiceImpacted));
+                    }
+                    logger.debug(StringUtils.join("SkuServiceAlerter going to sleep for ",
+                            skuServiceLogMonitoringIntervalInSeconds, "s."));
+                    Thread.sleep(skuServiceLogMonitoringIntervalInSeconds * 1000);
+                } catch (AuthenticationException | IOException | InterruptedException e) {
+                    String errMsg = StringUtils.join("UserDataServiceAlerter run into exception: ",
+                            e.getClass().getName(), " - ", e.getMessage(),
+                            " ... UserDataServiceAlerter will continue trying to send events anyway.");
+                    logger.warn(errMsg, e);
+                }
+            }
+        }
+    }
+
     class UserDataServicePerformanceAlerter implements Runnable {
         @Override
         public void run() {
@@ -55,10 +99,10 @@ public class SimpleDatastoreOutagePlaybook implements PlayBook {
                         logger.info(StringUtils.join("UserDataServicePerformanceAlerter going to send event to moogsoft: ",
                                 event.toString()));
                         dataUplink.sendEvent(event);
-                        logger.info(StringUtils.join("UserDataServicePerformanceAlerter going to sleep for ",
-                                userDataServiceWarningIntervalInSeconds, "s."));
                     }
-                    Thread.sleep(userDataServiceWarningIntervalInSeconds * 1000);
+                    logger.debug(StringUtils.join("UserDataServicePerformanceAlerter going to sleep for ",
+                            userDataServiceApmIntervalInSeconds, "s."));
+                    Thread.sleep(userDataServiceApmIntervalInSeconds * 1000);
                 } catch (AuthenticationException | IOException | InterruptedException e) {
                     String errMsg = StringUtils.join("UserDataServicePerformanceAlerter run into exception: ",
                             e.getClass().getName(), " - ", e.getMessage(),
@@ -74,22 +118,31 @@ public class SimpleDatastoreOutagePlaybook implements PlayBook {
         public void run() {
             while (true) {
                 try {
+                    // check if service just switched back to working again
+                    if (isUserDataServiceImpacted && isDatabaseWorking) {
+                        // database just got operative again. System reports a recovery event to moogsoft
+                        Event event = Event.getUserDataServiceBackToNormal();
+                        logger.info(StringUtils.join("UserDataServiceAlerter going to send event to moogsoft: ",
+                                event.toString()));
+                        dataUplink.sendEvent(event);
+                    }
+
                     isUserDataServiceImpacted = !isDatabaseWorking;
                     if (isUserDataServiceImpacted) {
-                        logger.info(StringUtils.join("********************* UserDataServiceAlerter if branch, isUserDataServiceImpacted=",
+                        logger.debug(StringUtils.join("********************* UserDataServiceAlerter if branch, isUserDataServiceImpacted=",
                                 isUserDataServiceImpacted));
 
                         Event event = Event.getUserDataServiceError();
                         logger.info(StringUtils.join("UserDataServiceAlerter going to send event to moogsoft: ",
                                 event.toString()));
                         dataUplink.sendEvent(event);
-                        logger.info(StringUtils.join("UserDataServiceAlerter going to sleep for ",
-                                userDataServiceMonitoringIntervalInSeconds, "s."));
                     } else {
-                        logger.info(StringUtils.join("********************* UserDataServiceAlerter else branch, isUserDataServiceImpacted=",
+                        logger.debug(StringUtils.join("********************* UserDataServiceAlerter else branch, isUserDataServiceImpacted=",
                                 isUserDataServiceImpacted));
                     }
-                    Thread.sleep(userDataServiceMonitoringIntervalInSeconds * 1000);
+                    logger.debug(StringUtils.join("UserDataServiceAlerter going to sleep for ",
+                            userDataServiceLogMonitoringIntervalInSeconds, "s."));
+                    Thread.sleep(userDataServiceLogMonitoringIntervalInSeconds * 1000);
                 } catch (AuthenticationException | IOException | InterruptedException e) {
                     String errMsg = StringUtils.join("UserDataServiceAlerter run into exception: ",
                             e.getClass().getName(), " - ", e.getMessage(),
@@ -110,14 +163,14 @@ public class SimpleDatastoreOutagePlaybook implements PlayBook {
                         logger.info(StringUtils.join("OrderServicePerformanceAlerter going to send event to moogsoft: ",
                                 event.toString()));
                         dataUplink.sendEvent(event);
-                        logger.info(StringUtils.join("OrderServicePerformanceAlerter going to sleep for ",
-                                orderServiceWarningIntervalInSeconds, "s."));
                     }
-                    Thread.sleep(orderServiceWarningIntervalInSeconds * 1000);
+                    logger.info(StringUtils.join("OrderServicePerformanceAlerter going to sleep for ",
+                            orderServiceApmIntervalInSeconds, "s."));
+                    Thread.sleep(orderServiceApmIntervalInSeconds * 1000);
                 } catch (AuthenticationException | IOException | InterruptedException e) {
                     String errMsg = StringUtils.join("OrderServicePerformanceAlerter run into exception: ",
                             e.getClass().getName(), " - ", e.getMessage(),
-                            " ... OrderServiceAlerter will continue trying to send events anyway.");
+                            " ... OrderServicePerformanceAlerter will continue trying to send events anyway.");
                     logger.warn(errMsg, e);
                 }
             }
@@ -129,24 +182,32 @@ public class SimpleDatastoreOutagePlaybook implements PlayBook {
         public void run() {
             while (true) {
                 try {
+                    // check if service just switched back to working again
+                    if (isOrderServiceImpacted && isDatabaseWorking) {
+                        // database just got operative again. System reports a recovery event to moogsoft
+                        Event event = Event.getOrderServiceBackToNormalEvent();
+                        logger.info(StringUtils.join("OrderServiceAlerter going to send event to moogsoft: ",
+                                event.toString()));
+                        dataUplink.sendEvent(event);
+                    }
                     isOrderServiceImpacted = !isDatabaseWorking;
                     if (isOrderServiceImpacted) {
-                        logger.info(StringUtils.join("********************* OrderServiceAlerter if branch, isOrderServiceImpacted=",
+                        logger.debug(StringUtils.join("********************* OrderServiceAlerter if branch, isOrderServiceImpacted=",
                                 isOrderServiceImpacted));
 
                         Event event = Event.getOrderServiceError();
-                        logger.info(StringUtils.join("OrderServicePerformanceAlerter going to send event to moogsoft: ",
+                        logger.info(StringUtils.join("OrderServiceAlerter going to send event to moogsoft: ",
                                 event.toString()));
                         dataUplink.sendEvent(event);
-                        logger.info(StringUtils.join("OrderServicePerformanceAlerter going to sleep for ",
-                                orderServiceMonitoringIntervalInSeconds, "s."));
                     } else {
-                        logger.info(StringUtils.join("********************* OrderServiceAlerter else branch, isOrderServiceImpacted=",
+                        logger.debug(StringUtils.join("********************* OrderServiceAlerter else branch, isOrderServiceImpacted=",
                                 isOrderServiceImpacted));
                     }
-                    Thread.sleep(orderServiceMonitoringIntervalInSeconds * 1000);
+                    logger.debug(StringUtils.join("OrderServiceAlerter going to sleep for ",
+                            orderServiceLogMonitoringIntervalInSeconds, "s."));
+                    Thread.sleep(orderServiceLogMonitoringIntervalInSeconds * 1000);
                 } catch (AuthenticationException | IOException | InterruptedException e) {
-                    String errMsg = StringUtils.join("OrderServicePerformanceAlerter run into exception: ",
+                    String errMsg = StringUtils.join("OrderServiceAlerter run into exception: ",
                             e.getClass().getName(), " - ", e.getMessage(),
                             " ... OrderServiceAlerter will continue trying to send events anyway.");
                     logger.warn(errMsg, e);
@@ -180,7 +241,7 @@ public class SimpleDatastoreOutagePlaybook implements PlayBook {
                         repetitionCounter = 0;
                     }
                     logger.info(StringUtils.join("DataStorageAlerter going to sleep for ",
-                            dataStorageWarningIntervalInSeconds * 1000, "s."));
+                            dataStorageWarningIntervalInSeconds, "s."));
                     Thread.sleep(dataStorageWarningIntervalInSeconds * 1000);
                 } catch (AuthenticationException | IOException | InterruptedException e) {
                     String errMsg = StringUtils.join("DataStorageAlerter run into exception: ",
@@ -202,8 +263,9 @@ public class SimpleDatastoreOutagePlaybook implements PlayBook {
                     logger.info(StringUtils.join("DatabaseAlerter going to send event to moogsoft: ",
                             event.toString()));
                     dataUplink.sendEvent(event);
+                    logger.info(StringUtils.join("DatabaseAlerter going to sleep for ",
+                            databaseErrorIntervalInSeconds, "s."));
                     Thread.sleep(databaseErrorIntervalInSeconds * 1000);
-
                 } catch (AuthenticationException | InterruptedException | IOException e) {
                     String errMsg = StringUtils.join("DatabaseAlerter run into exception: ",
                             e.getClass().getName(), " - ", e.getMessage(),
