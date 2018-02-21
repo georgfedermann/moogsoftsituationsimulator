@@ -114,12 +114,12 @@ public class Event {
                 ", source_id='" + source_id + '\'' +
                 ", external_id='" + external_id + '\'' +
                 ", agent_location='" + agent_location + '\'' +
-                ", severity=" + severity +
+                ", severity='" + severity + '\'' +
                 ", type='" + type + '\'' +
                 ", manager='" + manager + '\'' +
                 ", eventClass='" + eventClass + '\'' +
                 ", description='" + description + '\'' +
-                ", agent_time=" + agent_time +
+                ", agent_time='" + agent_time + '\'' +
                 ", additionalField1='" + additionalField1 + '\'' +
                 ", additionalField2='" + additionalField2 + '\'' +
                 '}';
@@ -149,7 +149,7 @@ public class Event {
         result.setSource("DataStorage_NAS001");
         result.setSourceId("CMDB_1");
         result.setAgentLocation("DC_FRA_02_25");
-        result.setSeverity(capacity >= 99 ? "4" : "2");
+        result.setSeverity(capacity >= 90 ? "5" : "2");
         result.setType("server/storage");
         result.setEventClass("storage");
         result.setDescription(StringUtils.join("The data storage runs full. Capacity used is ", capacity, "%!"));
