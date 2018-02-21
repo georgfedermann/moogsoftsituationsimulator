@@ -85,9 +85,14 @@ public class DataUplink {
             encodingDetector.handleData(serverReply, 0, serverReply.length);
             encodingDetector.dataEnd();
             String detectedEncoding = encodingDetector.getDetectedCharset();
-            logger.warn(StringUtils.join("Statuscode ", statusCode, " for url ", url, " and json ", json,
-                    "\nanswer from server encoded in ", detectedEncoding, " is: \n",
-                    IOUtils.toString(response.getEntity().getContent(), Charset.forName(detectedEncoding))));
+            if (detectedEncoding != null) {
+                logger.warn(StringUtils.join("Statuscode ", statusCode, " for url ", url, " and json ", json,
+                        "\nanswer from server encoded in ", detectedEncoding, " is: \n",
+                        IOUtils.toString(response.getEntity().getContent(), Charset.forName(detectedEncoding))));
+            } else {
+                logger.warn(StringUtils.join("Statuscode ", statusCode, " for url ", url, " and json ", json,
+                        "\nanswer from server is: \n", new String(serverReply)));
+            }
         } else if (logger.isDebugEnabled()) {
             logger.debug(StringUtils.join("Statuscode 200 for url ", url, " and json ", json));
         }

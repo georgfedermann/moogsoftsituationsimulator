@@ -239,6 +239,11 @@ public class SimpleDatastoreOutagePlaybook implements PlayBook {
                         currentCapacity = 60; // at this point, the admin adds storage (magically)
                         isDataStorageFullFlag = false;
                         repetitionCounter = 0;
+                        // inform event correlation system that the root cause has been resolved
+                        Event resolvedEvent = Event.getStorageResolvedEvent(currentCapacity);
+                        logger.info(StringUtils.join("DataStorageAlerter going to send event to moogsoft: ",
+                                event.toString()));
+                        dataUplink.sendEvent(event);
                     }
                     logger.info(StringUtils.join("DataStorageAlerter going to sleep for ",
                             dataStorageWarningIntervalInSeconds, "s."));

@@ -52,7 +52,7 @@ public class Event {
      * 4 .. Major
      * 5 .. Critical
      */
-    Integer severity = 1;
+    String severity = String.valueOf(1);
     /**
      * type	String	Level of classification for the event. Follows hierarchy class then type.
      * we go for the following values:
@@ -80,7 +80,11 @@ public class Event {
      * agent_time	String	Timestamp of when the event occurred in Unix epoch time.
      * The actual time when the event was raised.
      */
-    Long agent_time = new Date().getTime() / 1000;
+    String agent_time = String.valueOf(new Date().getTime() / 1000);
+
+    String additionalField1 = "additional data";
+
+    String additionalField2 = "additional data";
 
     public String getJson() {
         return "{" +
@@ -94,7 +98,9 @@ public class Event {
                 "'type':'" + getType() + "'," +
                 "'severity':" + getSeverity() + "," +
                 "'description':'" + getDescription() + "'," +
-                "'agent_time':'" + getAgentLocation() + "'" +
+                "'agent_time':'" + getAgentTime() + "'," +
+                "'additionalData1':'" + getAdditionalField1() + "'," +
+                "'additionalData2':'" + getAdditionalField2() + "'" +
                 "}";
     }
 
@@ -109,11 +115,13 @@ public class Event {
                 ", external_id='" + external_id + '\'' +
                 ", agent_location='" + agent_location + '\'' +
                 ", severity=" + severity +
-                ", description='" + description + '\'' +
                 ", type='" + type + '\'' +
                 ", manager='" + manager + '\'' +
                 ", eventClass='" + eventClass + '\'' +
+                ", description='" + description + '\'' +
                 ", agent_time=" + agent_time +
+                ", additionalField1='" + additionalField1 + '\'' +
+                ", additionalField2='" + additionalField2 + '\'' +
                 '}';
     }
 
@@ -141,10 +149,12 @@ public class Event {
         result.setSource("DataStorage_NAS001");
         result.setSourceId("CMDB_1");
         result.setAgentLocation("DC_FRA_02_25");
-        result.setSeverity(2);
+        result.setSeverity(capacity >= 99 ? "4" : "2");
         result.setType("server/storage");
         result.setEventClass("storage");
         result.setDescription(StringUtils.join("The data storage runs full. Capacity used is ", capacity, "%!"));
+        result.setAdditionalField1("The datastorage is the root of all evil");
+        result.setAdditionalField2("Mea culpa");
         return result;
     }
 
@@ -153,10 +163,26 @@ public class Event {
         result.setSource("DataStorage_NAS001");
         result.setSourceId("CMDB_1");
         result.setAgentLocation("DC_FRA_02_25");
-        result.setSeverity(0);
+        result.setSeverity("0");
         result.setType("server/storage");
         result.setEventClass("storage");
         result.setDescription(StringUtils.join("The data storage is ok. Capacity used is ", capacity, "%!"));
+        result.setAdditionalField1("It is not us!");
+        result.setAdditionalField2("Better ask them.");
+        return result;
+    }
+
+    public static Event getStorageResolvedEvent(int capacity) {
+        Event result = new Event();
+        result.setSource("DataStorage_NAS001");
+        result.setSourceId("CMDB_1");
+        result.setAgentLocation("DC_FRA_02_25");
+        result.setSeverity("1");
+        result.setType("server/storage");
+        result.setEventClass("storage");
+        result.setDescription(StringUtils.join("The data storage issues was just resolved. Capacity used is ", capacity, "%!"));
+        result.setAdditionalField1("It is not us!");
+        result.setAdditionalField2("Better ask them.");
         return result;
     }
 
@@ -165,10 +191,12 @@ public class Event {
         result.setSource("Database MySQL");
         result.setSourceId("CMDB_2");
         result.setAgentLocation("DC_FRA_02_25");
-        result.setSeverity(0);
+        result.setSeverity("0");
         result.setType("server/storage");
         result.setEventClass("storage");
         result.setDescription(StringUtils.join("Just meant to say: the database is running alrighty-right!"));
+        result.setAdditionalField1("The database is not to blame!");
+        result.setAdditionalField2("It is probably the network.");
         return result;
     }
 
@@ -177,10 +205,12 @@ public class Event {
         result.setSource("Database MySQL");
         result.setSourceId("CMDB_2");
         result.setAgentLocation("DC_FRA_02_25");
-        result.setSeverity(5);
+        result.setSeverity("5");
         result.setType("server/storage");
         result.setEventClass("storage");
         result.setDescription(StringUtils.join("The database just crashed! Error message is: The data storage is full. Capacity used is 100%"));
+        result.setAdditionalField1("The database is down, but not the cause.");
+        result.setAdditionalField2("We think, the network is down.");
         return result;
     }
 
@@ -189,10 +219,12 @@ public class Event {
         result.setSource("Order Service APM");
         result.setSourceId("CMDB_3");
         result.setAgentLocation("DC_FRA_02_26");
-        result.setSeverity(2);
+        result.setSeverity("2");
         result.setType("service/backend");
         result.setEventClass("service");
         result.setDescription(StringUtils.join("OrderService performance impacted. Service not answering for prolonged intervals."));
+        result.setAdditionalField1("The order service is not performing so good.");
+        result.setAdditionalField2("Probably the network is down?");
         return result;
     }
 
@@ -201,7 +233,7 @@ public class Event {
         result.setSource("Order Service Logfile Monitor");
         result.setSourceId("CMDB_3");
         result.setAgentLocation("DC_FRA_02_26");
-        result.setSeverity(5);
+        result.setSeverity("5");
         result.setType("service/backend");
         result.setEventClass("service");
         result.setDescription(StringUtils.join("Order Service logs error message: database connection timeout. java.net.SocketException: java.net.ConnectException: Connection timed out: connect"));
@@ -213,7 +245,7 @@ public class Event {
         result.setSource("Order Service Logfile Monitor");
         result.setSourceId("CMDB_3");
         result.setAgentLocation("DC_FRA_02_26");
-        result.setSeverity(0);
+        result.setSeverity("0");
         result.setType("service/backend");
         result.setEventClass("service");
         result.setDescription(StringUtils.join("Order Service logs that the service is back to normal."));
@@ -225,7 +257,7 @@ public class Event {
         result.setSource("Userdata Service APM");
         result.setSourceId("CMDB_4");
         result.setAgentLocation("DC_FRA_04_01");
-        result.setSeverity(2);
+        result.setSeverity("2");
         result.setType("service/backend");
         result.setEventClass("service");
         result.setDescription(StringUtils.join("Userdata Service logs error message: database connection timeout. java.net.SocketException: java.net.ConnectException: Connection timed out: connect"));
@@ -237,7 +269,7 @@ public class Event {
         result.setSource("Userdata Service APM");
         result.setSourceId("CMDB_4");
         result.setAgentLocation("DC_FRA_04_01");
-        result.setSeverity(0);
+        result.setSeverity("0");
         result.setType("service/backend");
         result.setEventClass("service");
         result.setDescription(StringUtils.join("Userdata Service logs that the service is back to normal"));
@@ -249,7 +281,7 @@ public class Event {
         result.setSource("Userdata Service Logfile Monitor");
         result.setSourceId("CMDB_4");
         result.setAgentLocation("DC_FRA_04_01");
-        result.setSeverity(5);
+        result.setSeverity("5");
         result.setType("service/backend");
         result.setEventClass("service");
         result.setDescription(StringUtils.join("UserDataService performance impacted. Service not answering for prolonged intervals."));
@@ -261,7 +293,7 @@ public class Event {
         result.setSource("SKU Service Logfile Monitor");
         result.setSourceId("CMDB_5");
         result.setAgentLocation("DC_FRA_02_27");
-        result.setSeverity(5);
+        result.setSeverity("5");
         result.setType("service/backend");
         result.setEventClass("service");
         result.setDescription(StringUtils.join("SKU Service logs error message: database connection timeout. java.net.SocketException: java.net.ConnectException: Connection timed out: connect."));
@@ -273,7 +305,7 @@ public class Event {
         result.setSource("SKU Service Logfile Monitor");
         result.setSourceId("CMDB_5");
         result.setAgentLocation("DC_FRA_02_27");
-        result.setSeverity(0);
+        result.setSeverity("0");
         result.setType("service/backend");
         result.setEventClass("service");
         result.setDescription(StringUtils.join("Userdata Service logs that the service is back to normal"));
@@ -282,7 +314,7 @@ public class Event {
 
     public static Event getStandardEventAtSeverityLevel(int severity) {
         Event event = new Event();
-        event.setSeverity(severity);
+        event.setSeverity(String.valueOf(severity));
         return event;
     }
 
@@ -346,14 +378,6 @@ public class Event {
         this.type = type;
     }
 
-    public Integer getSeverity() {
-        return severity;
-    }
-
-    public void setSeverity(Integer severity) {
-        this.severity = severity;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -362,11 +386,35 @@ public class Event {
         this.description = description;
     }
 
-    public Long getAgentTime() {
+    public String getAdditionalField1() {
+        return additionalField1;
+    }
+
+    public void setAdditionalField1(String additionalField1) {
+        this.additionalField1 = additionalField1;
+    }
+
+    public String getAdditionalField2() {
+        return additionalField2;
+    }
+
+    public void setAdditionalField2(String additionalField2) {
+        this.additionalField2 = additionalField2;
+    }
+
+    public String getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(String severity) {
+        this.severity = severity;
+    }
+
+    public String getAgentTime() {
         return agent_time;
     }
 
-    public void setAgentTime(Long agent_time) {
+    public void setAgentTime(String agent_time) {
         this.agent_time = agent_time;
     }
 
